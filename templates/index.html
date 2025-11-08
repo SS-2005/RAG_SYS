@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Return Assistant</title>
+    <title>ReturnBot - AI Product Return Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -791,6 +791,23 @@
         .notification.error {
             border-left-color: var(--error);
         }
+
+        /* Products grid in info panel */
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-tag {
+            background: rgba(138, 43, 226, 0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            color: var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -808,10 +825,10 @@
                 <div class="logo-text">ReturnBot</div>
             </div>
             <nav class="nav-links">
-                <a href="#" class="nav-link active">Home</a>
-                <a href="#" class="nav-link">Policies</a>
-                <a href="#" class="nav-link">FAQ</a>
-                <a href="#" class="nav-link">Contact</a>
+                <a href="#" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+                <a href="#" class="nav-link"><i class="fas fa-file-contract"></i> Policies</a>
+                <a href="#" class="nav-link"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="#" class="nav-link"><i class="fas fa-envelope"></i> Contact</a>
             </nav>
         </div>
     </header>
@@ -823,19 +840,14 @@
                 <div class="header-content">
                     <h1><i class="fas fa-robot"></i> Product Return Assistant</h1>
                     <p>
-                        Ask about return policies for laptops, smartphones, clothing, and more!
+                        AI-powered return policy help for laptops, smartphones, clothing, and more!
                     </p>
                 </div>
             </header>
 
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages">
-                    <!-- Messages will be added here dynamically -->
-                    <div class="message agent-message">
-                        <div class="message-content">
-                            Hello! I can help you check if you can return a product. Please tell me what product you'd like to return.
-                        </div>
-                    </div>
+                    <!-- Messages will be loaded dynamically by JavaScript -->
                 </div>
 
                 <div class="typing-indicator" id="typingIndicator">
@@ -855,7 +867,7 @@
                         <input
                             type="text"
                             id="messageInput"
-                            placeholder="Type your message here..."
+                            placeholder="Ask about return policies for any product..."
                             autocomplete="off"
                         />
                         <button id="sendButton">
@@ -869,12 +881,21 @@
             </div>
 
             <div class="info-panel">
-                <h3><i class="fas fa-lightbulb"></i> Sample Questions:</h3>
+                <h3><i class="fas fa-boxes"></i> Available Products</h3>
+                <div class="products-grid" id="productsGrid">
+                    {% for product in products %}
+                    <span class="product-tag">{{ product }}</span>
+                    {% endfor %}
+                </div>
+                
+                <h3><i class="fas fa-lightbulb"></i> Smart Features</h3>
                 <ul>
-                    <li>"I want to return my laptop"</li>
-                    <li>"Can I return a smartphone I bought 2 weeks ago?"</li>
-                    <li>"My headphones are damaged, can I return them?"</li>
-                    <li>"Return policy for clothing"</li>
+                    <li>🧠 Understands natural language queries</li>
+                    <li>📅 Automatically extracts purchase dates</li>
+                    <li>🔍 Searches policy database intelligently</li>
+                    <li>✅ Determines return eligibility instantly</li>
+                    <li>💬 Maintains conversation context</li>
+                    <li>🎯 Asks relevant follow-up questions</li>
                 </ul>
             </div>
         </div>
@@ -912,7 +933,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 ReturnBot. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--secondary);"></i> for anime enthusiasts</p>
+            <p>&copy; 2024 ReturnBot. All rights reserved. | Powered by AI | Designed with <i class="fas fa-heart" style="color: var(--secondary);"></i></p>
         </div>
     </footer>
 
@@ -927,6 +948,7 @@
                 this.chatMessages = document.getElementById('chatMessages');
                 this.typingIndicator = document.getElementById('typingIndicator');
                 this.notification = document.getElementById('notification');
+                this.productsGrid = document.getElementById('productsGrid');
                 
                 this.initEventListeners();
                 this.loadChatHistory();
@@ -949,11 +971,11 @@
                 // Auto-focus input
                 this.messageInput.focus();
                 
-                // Add click handlers for sample questions
-                const sampleQuestions = document.querySelectorAll('.info-panel li');
-                sampleQuestions.forEach(question => {
-                    question.addEventListener('click', () => {
-                        this.messageInput.value = question.textContent;
+                // Add click handlers for product tags
+                const productTags = document.querySelectorAll('.product-tag');
+                productTags.forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        this.messageInput.value = `What is the return policy for ${tag.textContent}?`;
                         this.messageInput.focus();
                     });
                 });
@@ -1052,10 +1074,12 @@
                         }
                     });
                     
+                    const data = await response.json();
+                    
                     if (response.ok) {
                         this.chatMessages.innerHTML = '';
                         // Add welcome message
-                        this.addMessage('agent', 'Hello! I can help you check if you can return a product. Please tell me what product you\'d like to return.');
+                        this.addMessage('agent', data.welcome_message);
                         this.saveChatHistory();
                         this.showNotification('Chat cleared successfully!', 'success');
                     }
@@ -1075,6 +1099,22 @@
                         data.chat_history.forEach(msg => {
                             this.addMessage(msg.sender, msg.message);
                         });
+                    } else {
+                        // Add default welcome message if no history
+                        this.addMessage('agent', `🤖 Welcome to ReturnBot! 
+
+I'm your AI-powered Product Return Assistant, here to help you with return policies and eligibility checks.
+
+📦 Available Products I Can Help With:
+laptop, smartphone, headphones, clothing, books, furniture, tablet, camera
+
+💬 How I Can Assist You:
+• Check return policies for specific products
+• Determine if you're eligible to return an item
+• Explain return conditions and timeframes
+• Answer any return-related questions
+
+🎯 Just tell me what product you're interested in, and I'll guide you through the process!`);
                     }
                 } catch (error) {
                     console.error('Error loading chat history:', error);
