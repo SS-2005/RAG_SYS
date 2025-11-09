@@ -167,43 +167,36 @@ Simple terms: "today", "just bought it"
 
 "damaged", "broken", "not working"
 
-## 🤖 AI Model Details
+## 🤖 Model Details
 
-### Primary Model: Microsoft DialoGPT-medium
+### 📚 Embedding Model:
+sentence-transformers/all-MiniLM-L6-v2
 
-Type: Transformer-based conversational AI
+Purpose: Converts text (like product policies and user queries) into vector embeddings for semantic similarity search.
 
-Size: ~300MB
+Framework: Hugging Face / Sentence Transformers
 
-Capabilities: Natural language understanding, context maintenance
+Dimension: 384
 
-Usage: Intent recognition and response generation
+Reason: Lightweight, fast, and widely used for retrieval tasks — perfect for local vector databases.
 
-### Embedding Model: SentenceTransformers/all-MiniLM-L6-v2
+### 🧩 Vector Database:
+Chroma (with FAISS backend)
 
-Type: Sentence embedding model
+Purpose: Stores document embeddings and retrieves the most relevant chunks during a query.
 
-Size: ~80MB
+Works as the retriever in your RAG pipeline.
 
-Usage: Creating vector embeddings for policy documents
+### 🗣️ Large Language Model (LLM):
+tiiuae/falcon-7b-instruct
 
-### Model Loading Process
-Models are downloaded automatically on first run
+Purpose: Generates natural language responses based on the context retrieved from the vector store.
 
-Cached locally for subsequent runs
+Type: Instruction-tuned causal language model (7 billion parameters).
 
-Fallback to rule-based system if models fail to load
+Hosted Locally (not API-dependent).
 
-## 🗄️ Database Information
-Vector Database: ChromaDB
-
-Type: Open-source vector database
-
-Storage: Local persistent storage
-
-Embeddings: 384-dimensional vectors
-
-Search: Cosine similarity with top-k retrieval
+Known for: Strong performance on reasoning and question-answering tasks.
 
 ### Policy Documents Structure
 Each policy document contains:
