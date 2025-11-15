@@ -1,6 +1,6 @@
 # ReturnBot - AI-Powered Product Return Assistant 🤖
 
-A sophisticated AI-powered chatbot that helps users check product return policies and eligibility using natural language processing and vector database search.
+A AI-powered chatbot that helps users check product return policies and eligibility using natural language processing and vector database search.
 
 
 ## 🌟 Features
