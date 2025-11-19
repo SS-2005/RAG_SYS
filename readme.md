@@ -1,6 +1,8 @@
 # ReturnBot - AI-Powered RAG Product Return Assistant 🤖
 
+
 A AI-powered chatbot that helps users check product return policies and eligibility using natural language processing and vector database search.
+
 
 
 ## 🌟 Features
